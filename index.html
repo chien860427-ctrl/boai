@@ -504,19 +504,23 @@
           <span id="pauMarkerBadge" style="background:#EEF0FF;color:#5856D6;font-size:11px;font-weight:500;padding:3px 10px;border-radius:10px;display:none;">偵測到 0 個變數標記</span>
         </div>
       </div>
-      <div id="pauInfoBanner" style="display:none;align-items:flex-start;gap:8px;padding:10px 14px;background:#F4F5FF;border:1px solid #D8DCFF;border-radius:6px;margin-bottom:28px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5856D6" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <div style="font-size:12px;color:#4A48B5;line-height:1.5;">
-          此 PDF 含 HIS 變數標記 <code style="background:#fff;padding:0 4px;border-radius:3px;font-size:11px;">${...}</code>，點擊「下一步」將由系統自動解析並放置對應欄位。
-        </div>
-      </div>
       <div id="pauNoMarkerBanner" style="display:none;align-items:flex-start;gap:8px;padding:10px 14px;background:#FFF9E6;border:1px solid #F2D888;border-radius:6px;margin-bottom:28px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9C6B00" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <div style="font-size:12px;color:#805500;line-height:1.5;">
           此 PDF 未偵測到變數標記 <code style="background:#fff;padding:0 4px;border-radius:3px;font-size:11px;">${...}</code>，按下一步將直接進入手動拖拉模式。
         </div>
       </div>
-      <div style="margin-bottom:28px;"></div>
+      <!-- 變數欄位標記 -->
+      <div id="pauFieldTypeSection" style="display:none;">
+        <details id="pauTypePanel" style="border:1px solid #D8DCFF;border-radius:6px;background:#F4F5FF;margin-bottom:28px;overflow:hidden;">
+          <summary style="list-style:none;display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5856D6" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span style="font-size:12px;color:#4A48B5;">變數欄位類型ID<span id="pauTypeTotal" style="margin-left:8px;">共 0 個</span></span>
+            <svg class="pau-chev-outer" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5856D6" stroke-width="2" style="margin-left:auto;transition:transform .15s;"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div id="pauTypeList" style="background:#fff;border-top:1px solid #D8DCFF;"></div>
+        </details>
+      </div>
 
       <!-- 管理簽署者 -->
       <div style="font-size:17px;font-weight:700;color:#000;margin-bottom:16px;">管理簽署者</div>
@@ -1655,16 +1659,15 @@ function updatePageAfterUploadUI() {
   if (metaEl) metaEl.textContent = ((hisPdfData.pageCount === 1 ? '單頁' : hisPdfData.pageCount + ' 頁')) + ', ' + sizeMB + ' MB';
 
   const badge = document.getElementById('pauMarkerBadge');
-  const infoBanner = document.getElementById('pauInfoBanner');
   const noBanner = document.getElementById('pauNoMarkerBanner');
-  const count = hisPdfData.rawMarkers.length;
+  const count = pauUniqueFields().total;
   if (badge) {
     if (count > 0) { badge.style.display = 'inline-block'; badge.textContent = '偵測到 ' + count + ' 個變數標記'; }
     else { badge.style.display = 'none'; }
   }
-  if (infoBanner) infoBanner.style.display = count > 0 ? 'flex' : 'none';
   if (noBanner) noBanner.style.display = count > 0 ? 'none' : 'flex';
 
+  renderPauFieldTypeList();
   renderPauSignerRows();
 }
 
@@ -1719,6 +1722,102 @@ function addPauSignerRow(e) {
 function removeSignerRow(el) {
   const row = el.closest('.pau-signer-row');
   if (row) row.remove();
+}
+
+const PAU_TYPE_ICONS = {
+  Textfield: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 L4 3 L6 3"/><path d="M18 3 L20 3 L20 4"/><path d="M20 20 L20 21 L18 21"/><path d="M6 21 L4 21 L4 20"/><path d="M4 8 L20 8"/><path d="M4 16 L20 16"/><path d="M8 4 L8 20"/><path d="M16 4 L16 20"/><text x="12" y="15" font-size="9" font-weight="700" fill="#1a1a1a" stroke="none" text-anchor="middle" font-family="Arial, sans-serif">T</text></svg>',
+  Checkbox: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M7.5 12 L10.5 15 L16.5 8"/></svg>',
+  CheckboxGroup: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="14" height="14" rx="2.5" opacity="0.55"/><rect x="7.5" y="7.5" width="14" height="14" rx="2.5" fill="#fff"/><path d="M11 14.5 L14 17.5 L20 11"/></svg>',
+  RadioGroup: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6"><circle cx="9" cy="9" r="7" opacity="0.55"/><circle cx="14" cy="14" r="7" fill="#fff"/><circle cx="14" cy="14" r="3" fill="#1a1a1a" stroke="none"/></svg>',
+  Signature: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 Q7 17 9 19 Q11 21 13 18"/><path d="M11 15 L18 5 Q19 3.5 20.5 5 Q22 6.5 20.5 8 L13 17 L10 18 Z"/></svg>',
+  Date: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5 L21 9.5"/><path d="M8 3 L8 6"/><path d="M16 3 L16 6"/></svg>',
+  SystemTime: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5 L21 9.5"/><path d="M8 3 L8 6"/><path d="M16 3 L16 6"/><circle cx="16" cy="15" r="4"/><path d="M16 13 L16 15 L17.5 16"/></svg>',
+  Image: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6" fill="#1a1a1a" stroke="none"/><path d="M4 17 L9 12 L13 15.5 L16.5 12 L20 16"/></svg>',
+  Hyperlink: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.7" stroke-linecap="round"><rect x="2" y="9" width="8" height="6" rx="3" transform="rotate(-40 6 12)"/><rect x="14" y="9" width="8" height="6" rx="3" transform="rotate(-40 18 12)"/></svg>'
+};
+
+const PAU_TYPE_LABELS = {
+  Textfield: '文字', Checkbox: '核取方塊', CheckboxGroup: '核取方塊群組',
+  RadioGroup: '選擇鈕群組', Signature: '簽名', Date: '日期',
+  SystemTime: '系統時間', Image: '圖片', Hyperlink: '超連結'
+};
+
+function pauSignerColor(sid) {
+  return sid === 'signer1' ? { c: '#5856D6', bg: '#EEF0FF' } : { c: '#1296B5', bg: '#E8F7FB' };
+}
+
+// Groups raw ${Type,id,signer,w,req} markers by type, deduping by id so a
+// multi-option group (e.g. RadioGroup with 2 options sharing the same id)
+// only counts as one field. This is the single source of truth for "how many
+// variable fields were detected" — used by both the file-card badge and the
+// 變數欄位類型ID panel, so the two numbers always agree.
+function pauUniqueFields() {
+  const markers = hisPdfData.rawMarkers || [];
+  const byType = {};
+  const seenIds = {};
+  markers.forEach(function (m) {
+    const key = m.type + '|' + m.id;
+    if (seenIds[key]) return;
+    seenIds[key] = true;
+    (byType[m.type] = byType[m.type] || []).push(m);
+  });
+  const total = Object.keys(byType).reduce(function (sum, t) { return sum + byType[t].length; }, 0);
+  return { byType: byType, total: total };
+}
+
+function renderPauFieldTypeList() {
+  const section = document.getElementById('pauFieldTypeSection');
+  if (!section) return;
+  const markers = hisPdfData.rawMarkers || [];
+  if (markers.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  const unique = pauUniqueFields();
+  const byType = unique.byType;
+  const types = Object.keys(byType);
+
+  const totalEl = document.getElementById('pauTypeTotal');
+  if (totalEl) totalEl.textContent = '共 ' + unique.total + ' 個';
+
+  const listEl = document.getElementById('pauTypeList');
+  if (!listEl) return;
+  listEl.innerHTML = types.map(function (t, i) {
+    const icon = PAU_TYPE_ICONS[t] || '';
+    const label = PAU_TYPE_LABELS[t] || t;
+    const items = byType[t];
+    const rows = items.map(function (m) {
+      const sc = pauSignerColor(m.signer);
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 14px 5px 42px;">' +
+        '<span style="font-size:11.5px;font-family:monospace;color:#555;">' + m.id + '</span>' +
+        '<span style="background:' + sc.bg + ';color:' + sc.c + ';font-size:10px;font-weight:500;padding:1px 6px;border-radius:6px;flex-shrink:0;margin-left:8px;">' + m.signer + '</span>' +
+      '</div>';
+    }).join('');
+    const borderTop = i === 0 ? '' : 'border-top:1px solid #efefef;';
+    return '<details style="' + borderTop + '">' +
+      '<summary style="list-style:none;display:flex;align-items:center;gap:14px;padding:10px 14px;cursor:pointer;">' +
+        '<span style="flex-shrink:0;display:flex;">' + icon + '</span>' +
+        '<span style="font-size:14.5px;font-weight:500;color:#000;flex:1;">' + label + '<span style="color:#999;font-weight:400;font-size:13px;margin-left:8px;">' + items.length + '</span></span>' +
+        '<svg class="pau-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" style="transition:transform .15s;"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</summary>' +
+      '<div style="max-height:168px;overflow-y:auto;padding-bottom:4px;">' + rows + '</div>' +
+    '</details>';
+  }).join('');
+
+  listEl.querySelectorAll('details').forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      const chev = this.querySelector('.pau-chev');
+      if (chev) chev.style.transform = this.open ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+  });
+
+  const outerPanel = document.getElementById('pauTypePanel');
+  if (outerPanel && !outerPanel.dataset.wired) {
+    outerPanel.dataset.wired = '1';
+    outerPanel.addEventListener('toggle', function () {
+      const chev = this.querySelector('.pau-chev-outer');
+      if (chev) chev.style.transform = this.open ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+  }
 }
 
 function normalizeEmail(s) {
