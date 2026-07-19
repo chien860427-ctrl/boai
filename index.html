@@ -756,29 +756,16 @@
       <button onclick="submitTaskAndSign()" style="background:#5856D6;border:none;border-radius:6px;padding:7px 22px;font-size:14px;color:#fff;cursor:pointer;font-weight:500;">下一步</button>
     </div>
   </div>
-  <div class="main-layout">
-    <div class="sidebar">
-      <div class="sidebar-group"><div class="sidebar-group-header"><div class="label">∨ 上傳文件</div><a href="#">編輯</a></div></div>
-      <div class="sidebar-group"><div class="sidebar-group-header"><div class="label">∨ 簽署者</div><a href="#">編輯</a></div></div>
-      <div class="sidebar-group">
-        <div class="sidebar-group-header"><div class="label">∧ 創建欄位</div></div>
-        <div class="role-selector"><div style="display:flex;align-items:center;gap:8px;"><div class="role-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></div><span style="font-size:14px;color:#000;">旅客</span></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
-        <div class="field-list">
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'簽名')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></div>簽名</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'日期')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>日期</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'文字')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></div>文字</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'核取方塊')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>核取方塊</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'核取方塊群組')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><rect x="2" y="7" width="6" height="6" rx="1"/><polyline points="4 10 5.5 11.5 8 9"/><rect x="2" y="16" width="6" height="6" rx="1"/><line x1="12" y1="10" x2="22" y2="10"/><line x1="12" y1="19" x2="22" y2="19"/></svg></div>核取方塊群組</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'選擇鈕')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="#333"/></svg></div>選擇鈕</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'選擇鈕群組')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><circle cx="6" cy="8" r="3.5"/><circle cx="6" cy="8" r="1.5" fill="#333"/><circle cx="6" cy="16" r="3.5"/><line x1="12" y1="8" x2="22" y2="8"/><line x1="12" y1="16" x2="22" y2="16"/></svg></div>選擇鈕群組</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'圖片')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>圖片</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'超連結')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>超連結</div>
-          <div class="field-item" draggable="true" ondragstart="dragField(event,'系統時間')"><div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>系統時間</div>
-        </div>
-      </div>
+  <div style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;padding:10px 20px;">
+    <div style="background:#e2e2e2;border-radius:8px;padding:3px;">
+      <span style="display:inline-block;background:#fff;border-radius:6px;padding:6px 22px;font-size:13px;color:#000;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.12);">預覽畫面</span>
     </div>
+  </div>
+  <div class="main-layout">
     <div class="doc-area">
-      <div class="doc-paper" id="page3DocPaper"><div class="sig-block"><span class="sig-asterisk">✳</span><span class="sig-label">簽名</span></div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:860px;">
+        <div class="doc-paper" id="page3DocPaper" style="width:100%;"><div class="sig-block"><span class="sig-asterisk">✳</span><span class="sig-label">簽名</span></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2099,7 +2086,10 @@ function populatePage3WithDetectedFields() {
 
   const paperAvail = Math.max(320, paper.offsetWidth - 32);
   const canvasW = hisPdfData.canvas.width;
-  const displayScale = Math.min(1, paperAvail / canvasW);
+  // Fill the available paper width exactly (no artificial 1x cap) so the PDF
+  // preview never sits small with empty space around it — it always scales
+  // up or down to snugly fit the container.
+  const displayScale = paperAvail / canvasW;
   const displayW = canvasW * displayScale;
   const displayH = hisPdfData.canvas.height * displayScale;
 
@@ -2130,6 +2120,7 @@ function populatePage3WithDetectedFields() {
 function getTypeLabel(t) {
   return { Textfield:'文字', Signature:'簽名', Datefield:'日期', Checkbox:'核取', Radio:'選擇', Systemtime:'系統時間' }[t] || t;
 }
+
 
 function showAutoPlaceToast(n) {
   let toast = document.getElementById('autoPlaceToast');
